@@ -79,16 +79,6 @@ function MoviesPage({ isAdmin = false }) {
 
     const searchKeyword = keyword.trim();
 
-    if (
-      searchKeyword &&
-      data.length === 0 &&
-      typeof window.gtag === "function"
-    ) {
-      window.gtag("event", "movie_search_no_results", {
-        search_term: searchKeyword,
-      });
-    }
-
     searchMovies(searchKeyword, sort);
   }
 
@@ -132,6 +122,17 @@ function MoviesPage({ isAdmin = false }) {
       }
 
       const data = await response.json();
+
+      if (
+        searchKeyword &&
+        data.length === 0 &&
+        typeof window.gtag === "function"
+      ) {
+        window.gtag("event", "movie_search_no_results", {
+          search_term: searchKeyword,
+        });
+      }
+
       setMovies(data);
     } catch (error) {
       console.error("영화 검색 실패:", error);
