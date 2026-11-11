@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/react";
 import { apiUrl, getAuthHeaders } from "../api.js";
 import { useEffect, useState } from "react";
 
@@ -39,9 +38,7 @@ function MoviesPage({ isAdmin = false }) {
 
   async function handleDelete(movie) {
     if (!isAdmin || isLoading || isDeleting) return;
-    const confirmed = window.confirm(
-      `"${movie.title}" 영화를 삭제하시겠습니까?`,
-    );
+    const confirmed = window.confirm(`"${movie.title}" 영화를 삭제하시겠습니까?`);
     if (!confirmed) return;
     setIsDeleting(true);
     setDeleteError("");
@@ -52,18 +49,14 @@ function MoviesPage({ isAdmin = false }) {
       });
       const data = await response.json();
       if (!response.ok) {
-        setDeleteError(
-          data.error || data.message || "영화를 삭제하지 못했습니다.",
-        );
+        setDeleteError(data.error || data.message || "영화를 삭제하지 못했습니다.");
         return;
       }
       setKeyword("");
       await searchMovies("", sort);
     } catch (error) {
       console.error("영화 삭제 처리 중 오류:", error);
-      setDeleteError(
-        error.message || "처리 중 오류가 발생했습니다. 다시 시도해 주세요.",
-      );
+      setDeleteError(error.message || "처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
     } finally {
       setIsDeleting(false);
     }
@@ -96,9 +89,6 @@ function MoviesPage({ isAdmin = false }) {
         const data = await response.json();
         setMovies(data);
       } catch (error) {
-        Sentry.captureException(error, {
-          tags: { operation: "movie_list" },
-        });
         console.error("영화 목록 요청 실패:", error);
         setError("영화 목록을 불러오지 못했습니다. 다시 시도해 주세요.");
       } finally {
@@ -137,9 +127,6 @@ function MoviesPage({ isAdmin = false }) {
       }
       setMovies(data);
     } catch (error) {
-      Sentry.captureException(error, {
-        tags: { operation: "movie_search" },
-      });
       console.error("영화 검색 실패:", error);
       setError("영화 목록을 불러오지 못했습니다. 다시 시도해 주세요.");
     } finally {
@@ -148,23 +135,14 @@ function MoviesPage({ isAdmin = false }) {
   }
 
   if (isAdmin && editingMovieId !== null) {
-    return (
-      <MovieEdit
-        movieId={editingMovieId}
-        handleUpdated={handleUpdated}
-        handleCancel={handleCancel}
-      />
-    );
+    return <MovieEdit movieId={editingMovieId} handleUpdated={handleUpdated} handleCancel={handleCancel} />;
   }
 
   return (
     <>
       {isAdmin && <MovieCreate handleCreated={handleCreated} />}
       <div className="mb-9">
-        <form
-          className="flex flex-col items-stretch gap-2 sm:flex-row"
-          onSubmit={handleSearch}
-        >
+        <form className="flex flex-col items-stretch gap-2 sm:flex-row" onSubmit={handleSearch}>
           <input
             aria-label="영화 제목"
             className="min-w-0 w-full sm:flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 focus:outline-2 focus:outline-blue-600"
@@ -194,18 +172,8 @@ function MoviesPage({ isAdmin = false }) {
           </button>
         </form>
       </div>
-      <p role="alert" className="mb-4 text-sm text-red-700">
-        {deleteError}
-      </p>
-      <MovieList
-        handleEdit={handleEdit}
-        isAdmin={isAdmin}
-        handleDelete={handleDelete}
-        isDeleting={isDeleting}
-        movies={movies}
-        isLoading={isLoading}
-        error={error}
-      />
+      <p role="alert" className="mb-4 text-sm text-red-700">{deleteError}</p>
+      <MovieList handleEdit={handleEdit} isAdmin={isAdmin} handleDelete={handleDelete} isDeleting={isDeleting} movies={movies} isLoading={isLoading} error={error} />
     </>
   );
 }
